@@ -85,4 +85,4 @@ src/
 
 ## Attribution
 
-Forecasts © Open-Meteo (CC BY 4.0). Map tiles © OpenStreetMap contributors / CARTO.
+Forecasts © Open-Meteo (CC BY 4.0). Map tiles © OpenStreetMap contributors.
