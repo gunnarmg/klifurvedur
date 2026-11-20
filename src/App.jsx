@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, useCallback } from 'react'
 import { CRAGS as SEED_CRAGS } from './data/crags.js'
 import { fetchForecasts, nearestForecast } from './lib/weather.js'
 import { sunPosition, sunOnWall } from './lib/sun.js'
@@ -8,6 +8,8 @@ import { useLocalStorage } from './lib/useLocalStorage.js'
 import { ScoreTile } from './components/ScoreTile.jsx'
 import { CragMap } from './components/CragMap.jsx'
 import { CragDetail } from './components/CragDetail.jsx'
+
+const ADMIN_PASS = 'klifur2024'
 
 // Format a Date as "YYYY-MM-DDTHH:MM" in Atlantic/Reykjavik for <input type=datetime-local>.
 // Reykjavik is UTC year-round, so we can use the UTC components directly.
@@ -41,12 +43,33 @@ function alignTarget(d) {
 
 export default function App() {
   // The user can edit crag data; we persist edits in localStorage.
-  const [crags, setCrags] = useLocalStorage('klifurvedur.crags.v2', SEED_CRAGS)
+  const [crags, setCrags] = useLocalStorage('klifurvedur.crags.v3', SEED_CRAGS)
   const [target, setTarget] = useState(() => roundToHour(new Date(Date.now() + 3 * 60 * 60 * 1000)))
   const [forecastsByCrag, setForecastsByCrag] = useState({})
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(false)
   const [selectedId, setSelectedId] = useState(crags[0]?.id)
+
+  // Admin auth — lightweight client-side gate for the sector editor.
+  const [isAdmin, setIsAdmin] = useState(() => sessionStorage.getItem('klifurvedur.admin') === '1')
+  const [showLogin, setShowLogin] = useState(false)
+  const [loginError, setLoginError] = useState('')
+
+  const handleLogin = useCallback((pass) => {
+    if (pass === ADMIN_PASS) {
+      sessionStorage.setItem('klifurvedur.admin', '1')
+      setIsAdmin(true)
+      setShowLogin(false)
+      setLoginError('')
+    } else {
+      setLoginError('Wrong password')
+    }
+  }, [])
+
+  const handleLogout = useCallback(() => {
+    sessionStorage.removeItem('klifurvedur.admin')
+    setIsAdmin(false)
+  }, [])
 
   // Fetch forecasts for each crag (lat/lon based via Open-Meteo).
   // Refetches only when the list of crag locations changes.
@@ -132,37 +155,74 @@ export default function App() {
     }
   }
 
+  const setTomorrow5pm = () => {
+    const d = new Date()
+    d.setUTCDate(d.getUTCDate() + 1)
+    d.setUTCHours(17, 0, 0, 0)
+    setTarget(d)
+  }
+
   return (
     <div className="app">
       <header className="topbar">
         <div className="brand">
-          Klifur<span className="accent">veður</span>
-          <span className="sub">Sport climbing conditions · Reykjavík area · forecast: open-meteo{dataTime ? ` · data from ${dataTime}` : ''}</span>
+          Klifurvedur
+          <span className="sub">Sport climbing conditions — Iceland{dataTime ? ` · data from ${dataTime}` : ''}</span>
         </div>
         <div className="controls">
-          <label>
-            When
-            <input
-              type="datetime-local"
-              step="3600"
-              value={toLocalInput(target)}
-              onChange={(e) => setTarget(alignTarget(fromLocalInput(e.target.value)))}
-            />
-          </label>
-          <button onClick={() => setTarget(roundToHour(new Date()))}>Now</button>
-          <button onClick={() => {
-            const t = new Date(target)
-            t.setUTCHours(t.getUTCHours() - 3)
-            setTarget(alignTarget(t))
-          }}>−3h</button>
-          <button onClick={() => {
-            const t = new Date(target)
-            t.setUTCHours(t.getUTCHours() + 3)
-            setTarget(alignTarget(t))
-          }}>+3h</button>
-          <button onClick={resetCrags} title="Restore default crag/sector data">Reset data</button>
+          <input
+            type="datetime-local"
+            step="3600"
+            value={toLocalInput(target)}
+            onChange={(e) => setTarget(alignTarget(fromLocalInput(e.target.value)))}
+          />
+          <div className="btn-group">
+            <button onClick={() => setTarget(roundToHour(new Date()))}>Now</button>
+            <button onClick={setTomorrow5pm}>Tomorrow</button>
+          </div>
+          <div className="btn-group">
+            <button onClick={() => {
+              const t = new Date(target)
+              t.setUTCHours(t.getUTCHours() - 3)
+              setTarget(alignTarget(t))
+            }}>-3h</button>
+            <button onClick={() => {
+              const t = new Date(target)
+              t.setUTCHours(t.getUTCHours() + 3)
+              setTarget(alignTarget(t))
+            }}>+3h</button>
+          </div>
+          <div className="sep" />
+          <button onClick={resetCrags} title="Restore default crag/sector data">Reset</button>
+          {isAdmin ? (
+            <button onClick={handleLogout} title="Log out of admin">Admin ✓</button>
+          ) : (
+            <button onClick={() => setShowLogin(true)} title="Admin login to edit sectors">Admin</button>
+          )}
         </div>
       </header>
+
+      {showLogin && (
+        <div className="modal-overlay" onClick={() => setShowLogin(false)}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <h3>Admin login</h3>
+            <form onSubmit={(e) => {
+              e.preventDefault()
+              handleLogin(e.target.elements.pass.value)
+            }}>
+              <label>
+                Password
+                <input name="pass" type="password" autoFocus />
+              </label>
+              {loginError && <div className="login-error">{loginError}</div>}
+              <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
+                <button type="submit" className="primary">Log in</button>
+                <button type="button" onClick={() => setShowLogin(false)}>Cancel</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {error && <div className="error-banner">⚠ {error}</div>}
 
@@ -213,6 +273,7 @@ export default function App() {
           station={selectedData}
           target={target}
           onChange={updateCrag}
+          isAdmin={isAdmin}
         />
       )}
     </div>

@@ -2,12 +2,12 @@ import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
 import L from 'leaflet'
 
 const TONE_COLORS = {
-  go: '#2f7d3a',
-  good: '#6b8b1a',
-  marginal: '#c8941a',
-  poor: '#c45a1a',
-  nogo: '#9b1f1f',
-  unknown: '#8a8273'
+  go: '#16a34a',
+  good: '#65a30d',
+  marginal: '#ca8a04',
+  poor: '#ea580c',
+  nogo: '#dc2626',
+  unknown: '#94a3b8'
 }
 
 function makeIcon(score, tone) {
@@ -22,10 +22,10 @@ function makeIcon(score, tone) {
 }
 
 export function CragMap({ crags, scores, selectedId, onSelect }) {
-  // Center somewhere between Reykjavík and Akranes
-  const center = [64.22, -21.78]
+  // Center on Iceland to include all crags (Reykjavík area + Öræfi)
+  const center = [64.5, -19.2]
   return (
-    <MapContainer center={center} zoom={9} style={{ width: '100%', height: '100%' }}>
+    <MapContainer center={center} zoom={6} style={{ width: '100%', height: '100%' }}>
       <TileLayer
         url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
         maxZoom={19}
@@ -41,9 +41,9 @@ export function CragMap({ crags, scores, selectedId, onSelect }) {
             eventHandlers={{ click: () => onSelect(c.id) }}
           >
             <Popup>
-              <div style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
-                <strong style={{ fontFamily: 'Fraunces, serif', fontSize: 16 }}>{c.name}</strong>
-                <div style={{ fontSize: 11, color: '#666' }}>{c.region}</div>
+              <div style={{ fontFamily: 'Inter, sans-serif' }}>
+                <strong style={{ fontSize: 15, fontWeight: 600 }}>{c.name}</strong>
+                <div style={{ fontSize: 11, color: '#64748b' }}>{c.region}</div>
                 <div style={{ marginTop: 6 }}>
                   Score: <strong>{s?.score ?? '—'}</strong> ({s?.band?.label || 'no data'})
                 </div>

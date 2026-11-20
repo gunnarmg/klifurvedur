@@ -46,7 +46,7 @@ The wetness model is opinionated. The constants in `src/lib/wetness.js` translat
 
 ## Editable crag data
 
-The seed crag/sector data in `src/data/crags.js` is a starting point — aspects are best-guesses from guidebook descriptions and satellite imagery. Click any crag, scroll to "Sectors — edit", and fix the values. Edits persist to `localStorage` under `klifurvedur.crags.v2`.
+The seed crag/sector data in `src/data/crags.js` is a starting point — aspects are best-guesses from guidebook descriptions and satellite imagery. Click any crag, scroll to "Sectors — edit", and fix the values. Edits persist to `localStorage` under `klifurvedur.crags.v3`.
 
 To wipe edits and go back to seed values: hit "Reset data" in the top bar.
 

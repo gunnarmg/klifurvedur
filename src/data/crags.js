@@ -111,5 +111,33 @@ export const CRAGS = [
         notes: 'Gully — terrain blocks low sun. Edit aspect.'
       }
     ]
+  },
+  {
+    id: 'hnappavellir',
+    name: 'Hnappavellir',
+    region: 'Öræfi',
+    lat: 63.953,
+    lon: -16.851,
+    driveMinFromRvk: 320,
+    notes: 'Iceland\'s premier sport crag. Columnar basalt in Öræfi, southeast Iceland. Multi-pitch and single-pitch, 5.6–5.13 / 4–8a.',
+    topo: 'https://www.thecrag.com/en/climbing/iceland/south-east/area/12462159',
+    sectors: [
+      {
+        id: 'main',
+        name: 'Main wall',
+        aspect: 200, // SSW — afternoon sun
+        wallHeight: 30,
+        terrainAngle: 8,
+        notes: 'Main columnar basalt face. Afternoon sun.'
+      },
+      {
+        id: 'left-wing',
+        name: 'Left wing',
+        aspect: 160, // SSE — midday sun
+        wallHeight: 25,
+        terrainAngle: 10,
+        notes: 'Left section, catches midday sun earlier.'
+      }
+    ]
   }
 ]

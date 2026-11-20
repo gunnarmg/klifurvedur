@@ -24,7 +24,7 @@ function formatDay(d) {
   })
 }
 
-export function CragDetail({ crag, station, target, onChange }) {
+export function CragDetail({ crag, station, target, onChange, isAdmin }) {
   const sector = crag.sectors[0]
 
   // Build a timeline of forecasts × per-sector conditions, including the
@@ -109,7 +109,7 @@ export function CragDetail({ crag, station, target, onChange }) {
             <>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
                 <span style={{
-                  fontFamily: 'var(--display)',
+                  fontFamily: 'var(--sans)',
                   fontSize: 28,
                   fontWeight: 600,
                   color: wetnessColor(targetWetness.verdict.label)
@@ -166,11 +166,23 @@ export function CragDetail({ crag, station, target, onChange }) {
           </dl>
         </div>
 
-        {/* Sector editor */}
+        {/* Sector editor — admin only */}
         <div className="panel">
-          <h3>Sectors — edit</h3>
-          <SectorEditor crag={crag} onChange={onChange} />
+          {isAdmin ? (
+            <>
+              <h3>Sectors — edit</h3>
+              <SectorEditor crag={crag} onChange={onChange} />
+            </>
+          ) : (
+            <h3>Sectors</h3>
+          )}
           <dl className="kv" style={{ marginTop: 12 }}>
+            {!isAdmin && crag.sectors.map((s) => (
+              <span key={s.id}>
+                <dt>{s.name} aspect</dt>
+                <dd>{s.aspect.toFixed(0)}° ({compassFromDeg(s.aspect)})</dd>
+              </span>
+            ))}
             <dt>Coordinates</dt>
             <dd>{crag.lat.toFixed(4)}, {crag.lon.toFixed(4)}</dd>
             <dt>Drive from RVK</dt>

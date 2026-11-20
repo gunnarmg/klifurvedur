@@ -41,8 +41,9 @@ export function AspectCompass({ aspect, sun }) {
               textAnchor="middle"
               fontSize="9"
               fill="var(--ink-faint)"
-              fontFamily="var(--mono)"
-              letterSpacing="0.1em"
+              fontFamily="var(--sans)"
+              fontWeight="600"
+              letterSpacing="0.02em"
             >
               {c}
             </text>
