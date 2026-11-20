@@ -1,0 +1,25 @@
+{
+  "name": "klifurvedur",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Sport climbing crag conditions for Iceland — wind, temperature, sun-on-wall scoring from Open-Meteo forecasts.",
+  "scripts": {
+    "dev": "vite",
+    "fetch": "node scripts/fetch.mjs",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "leaflet": "^1.9.4",
+    "react-leaflet": "^4.2.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "vite": "^5.4.10"
+  }
+}
